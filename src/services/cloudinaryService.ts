@@ -8,11 +8,17 @@ export const uploadToCloudinary = async (file: File, onProgress?: (progress: num
         throw new Error('Cloudinary configuration missing');
     }
 
+    // Debug logging
+    console.log('Cloudinary Config:', {
+        cloudName: CLOUD_NAME,
+        preset: UPLOAD_PRESET,
+        fileSize: file.size,
+        fileType: file.type
+    });
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', UPLOAD_PRESET);
-    // Optional: add tags or context if needed
-    // formData.append('context', `original_name=${file.name}`);
 
     try {
         const response = await axios.post(
@@ -32,8 +38,12 @@ export const uploadToCloudinary = async (file: File, onProgress?: (progress: num
         );
 
         return response.data.secure_url;
-    } catch (error) {
-        console.error('Cloudinary upload error:', error);
+    } catch (error: any) {
+        console.error('Cloudinary upload error details:', {
+            message: error.message,
+            data: error.response?.data,
+            status: error.response?.status
+        });
         throw error;
     }
 };

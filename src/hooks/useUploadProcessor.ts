@@ -40,32 +40,51 @@ export const useUploadProcessor = () => {
                         throw new Error("User email missing");
                     }
 
-                    const gpsResponse = await extractGPS({
-                        emailId,
-                        imageName: item.file.name,
-                        imageUrl
-                    }).unwrap();
+                    let latitude = 0;
+                    let longitude = 0;
 
-                    if (gpsResponse.latitude && gpsResponse.longitude) {
+                    try {
+                        const gpsResponse = await extractGPS({
+                            emailId,
+                            imageName: item.file.name,
+                            imageUrl
+                        }).unwrap();
+
+                        if (gpsResponse.latitude && gpsResponse.longitude) {
+                            latitude = gpsResponse.latitude;
+                            longitude = gpsResponse.longitude;
+                        }
+                    } catch (err) {
+                        console.warn("API extraction failed, trying filename fallback...", err);
+                    }
+
+                    // Fallback: Parse filename if API failed
+                    if (!latitude || !longitude) {
+                        const filename = item.file.name;
+                        const match = filename.match(/latitude_([\d.]+)_longitude_([\d.]+)/);
+                        if (match) {
+                            latitude = parseFloat(match[1]);
+                            longitude = parseFloat(match[2]);
+                            console.log("Extracted GPS from filename:", latitude, longitude);
+                        }
+                    }
+
+                    if (latitude && longitude) {
                         dispatch(updateUploadData({
                             id: item.id,
-                            lat: gpsResponse.latitude,
-                            lng: gpsResponse.longitude
+                            lat: latitude,
+                            lng: longitude
                         }));
 
                         // 3. Save Plant
-                        dispatch(updateUploadStatus({ id: item.id, status: 'saving' as any })); // 'saving' is not in types, using gpsProcessing or new type? 
-                        // The user types said: 'idle' | 'uploading' | 'uploaded' | 'gpsProcessing' | 'saved' | 'error'
-                        // We'll stick to 'gpsProcessing' until saved, or add 'saving'?
-                        // User requested: idle | uploading | uploaded | gpsProcessing | saved | error
-                        // So we stay in gpsProcessing until saved? Or maybe 'uploaded' -> 'gpsProcessing' -> 'saved'
+                        dispatch(updateUploadStatus({ id: item.id, status: 'saving' as any }));
 
                         await savePlant({
                             emailId,
                             imageName: item.file.name,
                             imageUrl,
-                            latitude: gpsResponse.latitude,
-                            longitude: gpsResponse.longitude
+                            latitude,
+                            longitude
                         }).unwrap();
 
                         dispatch(updateUploadStatus({ id: item.id, status: 'saved' }));

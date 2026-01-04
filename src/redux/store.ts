@@ -13,7 +13,16 @@ export const store = configureStore({
         [plantApi.reducerPath]: plantApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(plantApi.middleware),
+        getDefaultMiddleware({
+            serializableCheck: {
+                // Ignore these action types
+                ignoredActions: ['upload/addToQueue', 'upload/updateUploadStatus', 'ui/addToast', 'ui/removeToast', 'plantApi/executeQuery/fulfilled', 'plantApi/executeQuery/rejected', 'plantApi/executeQuery/pending'],
+                // Ignore these field paths in all actions
+                ignoredActionPaths: ['payload.file', 'meta.arg', 'payload', 'upload.queue.file', 'meta.baseQueryMeta'],
+                // Ignore these paths in the state
+                ignoredPaths: ['upload.queue', 'ui.toasts'],
+            },
+        }).concat(plantApi.middleware),
 });
 
 setupListeners(store.dispatch);

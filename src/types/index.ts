@@ -16,7 +16,7 @@ export interface UploadItem {
     id: string; // unique internal ID
     file: File;
     previewUrl: string;
-    status: 'idle' | 'uploading' | 'uploaded' | 'gpsProcessing' | 'saved' | 'error';
+    status: 'idle' | 'uploading' | 'uploaded' | 'gpsProcessing' | 'saving' | 'saved' | 'error';
     progress: number;
     error?: string;
     // API response data

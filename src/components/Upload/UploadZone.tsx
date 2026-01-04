@@ -43,23 +43,31 @@ const UploadZone: React.FC = () => {
     return (
         <div
             {...getRootProps()}
-            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors
-        ${isDragActive ? 'border-farm-500 bg-farm-50' : 'border-gray-300 hover:border-farm-400 bg-gray-50'}`}
+            className={`
+                group relative border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-300 ease-in-out
+                ${isDragActive
+                    ? 'border-farm-500 bg-farm-50 scale-[1.02] shadow-lg'
+                    : 'border-gray-200 hover:border-farm-400 hover:bg-gray-50 hover:shadow-md bg-white'
+                }
+            `}
         >
             <input {...getInputProps()} />
-            <div className="flex flex-col items-center gap-3">
-                <div className={`p-3 rounded-full ${isDragActive ? 'bg-farm-100 text-farm-600' : 'bg-gray-200 text-gray-500'}`}>
-                    <UploadCloud size={32} />
+            <div className="flex flex-col items-center gap-4 relative z-10">
+                <div className={`
+                    p-4 rounded-full transition-colors duration-300
+                    ${isDragActive ? 'bg-farm-100 text-farm-600' : 'bg-gray-100 text-gray-500 group-hover:bg-farm-100 group-hover:text-farm-600'}
+                `}>
+                    <UploadCloud size={40} strokeWidth={1.5} />
                 </div>
-                <div>
-                    <p className="text-lg font-medium text-gray-700">
+                <div className="space-y-1">
+                    <p className="text-xl font-semibold text-gray-800 transition-colors group-hover:text-farm-700">
                         {isDragActive ? 'Drop images here' : 'Drag & Drop Plant Images'}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 max-w-xs mx-auto">
                         or click to browse from your device
                     </p>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
                     <ImageIcon size={14} />
                     <span>JPG, PNG supported</span>
                 </div>
